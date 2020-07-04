@@ -1,3 +1,4 @@
+<?php
 // Protege o acesso da páginas da área de membros
 function area_de_membros_paginas() {
 	global $post;
@@ -28,3 +29,4 @@ function area_de_membros_paginas() {
   }
 }
 add_action('template_redirect', 'area_de_membros_paginas');
+?>
