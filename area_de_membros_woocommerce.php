@@ -1,3 +1,4 @@
+<?php
 // Página de redirecionamento
 function area_de_membros_redirect() {
 	
@@ -222,3 +223,4 @@ function area_de_membros_conteudo( $atts = array(), $content = null ) {
 	}	
 }
 add_shortcode( 'areademembros', 'area_de_membros_conteudo' );
+?>
