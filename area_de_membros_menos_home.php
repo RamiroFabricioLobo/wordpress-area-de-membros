@@ -1,3 +1,4 @@
+<?php
 // Obriga a estar logado ou na página home para acessar o site
 // Adicione este código no arquivo functions.php do seu tema. Utilize preferencialmente um tema filho.
 function area_de_membros_menos_home() {
@@ -12,3 +13,4 @@ function area_de_membros_menos_home() {
   }
 }
 add_action('template_redirect', 'area_de_membros_menos_home');
+?>
