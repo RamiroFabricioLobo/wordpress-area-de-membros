@@ -1,3 +1,4 @@
+<?php
 // Protege o acesso de posts de uma determinada categoria para usar na área de membros
 function area_de_membros_posts_categoria() {
 	global $post;
@@ -33,3 +34,4 @@ function area_de_membros_posts_categoria() {
   }
 }
 add_action('template_redirect', 'area_de_membros_posts_categoria');
+?>
