@@ -9,7 +9,7 @@ function area_de_membros_paginas() {
 	}
 	
 	// Slug da páginas da área de membros
-    // Substitua o conteúdo desta variável pelo slug da página pai (ancestral)
+	// Substitua o conteúdo desta variável pelo slug da página pai (ancestral)
 	$membros_slug = 'membros';
 	
 	// Página de redirecionamento
