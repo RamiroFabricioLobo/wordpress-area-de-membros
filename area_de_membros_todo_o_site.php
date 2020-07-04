@@ -1,3 +1,4 @@
+<?php
 // Obriga o usuário a estar logado para acessar o site
 // Adicione este código no arquivo functions.php do seu tema. Utilize preferencialmente um tema filho.
 function area_de_membros_todo_o_site() {
@@ -12,3 +13,4 @@ function area_de_membros_todo_o_site() {
   }
 }
 add_action('template_redirect', 'area_de_membros_todo_o_site');
+?>
