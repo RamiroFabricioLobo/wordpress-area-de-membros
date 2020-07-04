@@ -1,3 +1,4 @@
+<?php
 // Protege o acesso a todos os posts de um site
 function area_de_membros_posts() {
 	global $post;
@@ -18,3 +19,4 @@ function area_de_membros_posts() {
   }
 }
 add_action('template_redirect', 'area_de_membros_posts');
+?>
