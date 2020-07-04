@@ -22,7 +22,7 @@ function area_de_membros_paginas() {
 	// Pega o slug da página pai
 	$parent_slug = $post_parent->post_name;
 	
-	// Se o usuário acessar uma página de membros e não estiver logado, redireciona para a página de login
+    // Se o usuário acessar uma página de membros e não estiver logado, redireciona para a página de login
 	if ( $parent_slug == $membros_slug and !is_user_logged_in() ) {
 		wp_redirect( $redirect_page );
 		exit;
