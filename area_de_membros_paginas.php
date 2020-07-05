@@ -3,7 +3,7 @@
 function area_de_membros_paginas() {
 	global $post;
 	
-	// Verifica se é um post
+	// Verifica se é um página
 	if ($post->post_type != 'page') {
 		return;
 	}
