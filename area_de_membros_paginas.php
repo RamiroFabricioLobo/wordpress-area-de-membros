@@ -3,7 +3,7 @@
 function area_de_membros_redirect() {
 	
 	// Substitua o conteúdo desta variável pelo endereço da sua página de login.
-	$redirect_page = 'https://www.modeloshostnet.com/lvt/meus-cadastro/';
+	$redirect_page = 'https://www.seudominio.com/login/';
 	
 	return $redirect_page;
 }
@@ -14,8 +14,8 @@ function area_de_membros_regras() {
 	// Configure aqui as suas regras de páginas para membros
 	$pages_members[] = array(
 		'pages' => array( // Não utilize http:// ou https://
-			'www.modeloshostnet.com/lvt/teste/teste-1/',
-			'www.modeloshostnet.com/lvt/contact-us/'
+			'www.seudominio.com/pagina-1/',
+			'www.seudominio.com/pagina-2/'
 
 		),
 		'parentpages' => array(
