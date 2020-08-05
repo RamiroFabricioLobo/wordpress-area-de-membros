@@ -2,8 +2,8 @@
 // Página de redirecionamento
 function area_de_membros_redirect() {
 	
-	// Substitua o conteúdo desta variável pelo endereço da sua página de login.
-	$redirect_page = 'https://www.modeloshostnet.com/lvt/';
+	// Substitua o conteúdo desta variável pelo endereço da sua página de venda de assinaturas.
+	$redirect_page = 'https://www.meusite.com/assinaturas';
 	
 	return $redirect_page;
 }
@@ -14,24 +14,30 @@ function area_de_membros_produtos_regras() {
 	// Configure aqui as suas regras de produtos para acesso a páginas e posts
 	$products_members[] = array(
 		'pages' => array(
-			'productid'	=> 316,
+			'productid'	=> 0,
+			'days' 		=> 0,
 			'pages' 	=> array( // Não utilize http:// ou https://
-				'www.modeloshostnet.com/lvt/teste/teste-1/',
-				'www.modeloshostnet.com/lvt/contact-us/'
-			)
+				'www.meusite.com/pagina1',
+				'www.meusite.com/pagina2'
+			),
+
 		),
+		
 		'parentpages' => array(
-			'productid'	=> 316,
+			'productid'	=> 0,
+			'days' 		=> 0,
 			'parents'	=> array(
-				'teste',
-				'teste1'
+				'parent1',
+				'parent2'
 			)
 		),
+		
 		'postcategories' => array(
-			'productid'		=> 316,
+			'productid'		=> 0,
+			'days' 			=> 0,
 			'categories'	=> array(
-				'teste',
-				'teste1'
+				'categoria1',
+				'categoria2'
 			)
 		)
 
@@ -44,7 +50,7 @@ function area_de_membros_produtos_regras() {
 function area_de_membros_produtos() {
 	global $post;
 
-	// Variável que define se será necessário redirecionar para a página de login
+	// Variável que define se será necessário redirecionar para a página de vendas
 	$redirect = false;
 	
 	// Página de redirecionamento
@@ -55,6 +61,7 @@ function area_de_membros_produtos() {
    
 	// Processa as regras de acesso
 	$necessary_products = array();
+	$expiration = array();
 	foreach ($products_members as $product_rule) {
 		
 		// Verifica se tem regra de produtos para páginas específicas
@@ -69,6 +76,7 @@ function area_de_membros_produtos() {
 				foreach ($product_rule['pages']['pages'] as $page) {
 					if ($url == $page) {
 						$necessary_products[] = $product_rule['pages']['productid'];
+						$expiration[ $product_rule['pages']['productid'] ] = $product_rule['pages']['days'];
 					}
 				}
 			}
@@ -89,6 +97,7 @@ function area_de_membros_produtos() {
 				foreach ($product_rule['parentpages']['parents'] as $parent) {
 					if ($parent_slug == $parent) {
 						$necessary_products[] = $product_rule['parentpages']['productid'];
+						$expiration[ $product_rule['parentpages']['productid'] ] = $product_rule['parentpages']['days'];
 					}
 				}
 			}
@@ -110,6 +119,7 @@ function area_de_membros_produtos() {
 				foreach ($product_rule['postcategories']['categories'] as $category) {
 					if (array_search($category, $postcategories) !== false) {
 						$necessary_products[] = $product_rule['postcategories']['productid'];
+						$expiration[ $product_rule['postcategories']['productid'] ] = $product_rule['postcategories']['days'];
 					}
 				}
 			}
@@ -126,19 +136,43 @@ function area_de_membros_produtos() {
 		$product_ids_by_curr_user = products_bought_by_curr_user();
 		
 		if (!empty($product_ids_by_curr_user)) {
-			foreach ($product_ids_by_curr_user as $productid) {
+			foreach ($product_ids_by_curr_user as $product_array) {
+				$productid 		= $product_array['ID'];
+				$StDataCompra 	= $product_array['data'];
+				
 				// Se o usuário comprou um dos produtos necessários para acessar
 				// a página ou post, desativa o redirecionamento e sai do loop
 				if (array_search($productid, $necessary_products) !== false) {
-					$redirect = false;
-					break;
+					
+					// Verifica se a assiratura expirou
+					$days = $expiration[ $productid ];
+				
+					// Data da expiração
+					$expiration_date = 
+						date( 
+							'Y-m-d', 
+								mktime(
+									0, 
+									0, 
+									0, 
+									substr($StDataCompra, 5, 2), 
+									substr($StDataCompra, 8, 2) + $days,  
+									substr($StDataCompra, 0, 4) 
+								)
+						);
+
+					// Se dias para expiração for zero ou se a assinatura NÃO estiver expirada
+					if ($days == 0 or date('Y-m-d') < substr($expiration_date, 0, 10) ) {
+						$redirect = false;
+						break;
+					}
 				}
 			}
 		}
 	}
 	
 	// Caso a página ou post tenha regras para produtos e o usuário
-	// não tenha comprado um desses produtos, redireciona para a página de login
+	// não tenha comprado um desses produtos (ou o produto expirou), redireciona para a página de vendas
 	if ($redirect) {
 		wp_redirect( $redirect_page );
 		exit;
@@ -167,16 +201,23 @@ function products_bought_by_curr_user() {
         'post_type'   => wc_get_order_types(),
 		'post_status' => $order_statuses,
     ) );
-   
+
     // Loop dos pedidos para verifica se o usuário comprou o produto
     if ( ! $customer_orders ) return;
     $product_ids = array();
     foreach ( $customer_orders as $customer_order ) {
+		
+		// Data do pedido
+		$StDataCompra = $customer_order->post_date;
+		
+		// Data da última alteração
+		//$StDataCompra = $customer_order->post_modified;
+		
         $order = wc_get_order( $customer_order->ID );
         $items = $order->get_items();
         foreach ( $items as $item ) {
             $product_id 	= $item->get_product_id();
-            $product_ids[] = $product_id;
+            $product_ids[] = array('ID' => $product_id, 'data' => $StDataCompra);
         }
     }
     return array_unique($product_ids);
@@ -191,8 +232,8 @@ function area_de_membros_conteudo( $atts = array(), $content = null ) {
 	
 	// Estraindo parâmetros do shortcode
     extract(shortcode_atts(array(
-     'products'			=> '',
-	 'mensagem_erro'	=> ''
+		'products'			=> '',
+		'mensagem_erro'	=> ''
     ), $atts));
 
 	// Extrai os IDs dos produtos
@@ -204,9 +245,10 @@ function area_de_membros_conteudo( $atts = array(), $content = null ) {
 	if (!empty($product_ids)) {
 		// Pega os produtos comprados pelo usuários
 		$product_ids_by_curr_user = products_bought_by_curr_user();
-		
 		if (!empty($product_ids_by_curr_user)) {
-			foreach ($product_ids_by_curr_user as $productid) {
+			foreach ($product_ids_by_curr_user as $product_array) {
+				$productid 		= $product_array['ID'];
+				
 				// Se o usuário comprou um dos produtos necessários para acessar
 				// a página ou post, ativa a exibição de conteúdo e sai do loop
 				if (array_search($productid, $product_ids) !== false) {
